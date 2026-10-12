@@ -33,3 +33,10 @@ The single specific problem this solves is linear convolution of two complex seq
 - `fft` and `ifft` require the input length to be an exact power of two. Anything else raises `ValueError`. If your input is not a power of two, pad it yourself or use `convolve`, which pads internally to the next power of two at or above `len(a)+len(b)-1`.
 - The empty sequence is a supported input to `fft` and `ifft` (returns `[]`). `convolve` returns `[]` if either operand is empty.
 - Floating-point error is inherent. Round-tripping `fft` then `ifft` recovers the input to roughly 1e-9 relative tolerance; do not assert exact equality on `complex` results in your own code.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
